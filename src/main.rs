@@ -11,7 +11,7 @@ fn main() {
     }
 
     match bracket_parser::parse(&args[1]) {
-        Ok(ast) => println!("parsed: {}", ast),
+        Ok(ast) => println!("parsed: {:?}", ast),
         Err(e) => match e {
             bracket_parser::ParseError::HasNoClosing(at) => {
                 eprintln!("not close at: {}", at);

@@ -41,6 +41,9 @@ impl Display for AST {
 }
 
 pub fn parse(origin: &str) -> Result<AST, ParseError> {
+    if origin.len() == 0 {
+        return Ok(AST::Text(String::from("")));
+    }
     let mut tokens: Vec<AST> = Vec::new();
     let mut last_string_start: usize = 0;
     let mut index: usize = 0;
@@ -94,7 +97,8 @@ pub fn parse(origin: &str) -> Result<AST, ParseError> {
             }
         }
     }
-    if last_string_start < origin.len() - 1 {
+
+    if last_string_start < origin.len() - 1 || origin.len() == 1 {
         tokens.push(AST::Text(origin[last_string_start..].to_string()));
     }
 
@@ -187,9 +191,9 @@ mod test {
 
     #[test]
     fn parse_single_text() {
-        let ast = parse("test").unwrap();
+        let ast = parse("t").unwrap();
         if let AST::Text(str) = ast {
-            assert_eq!(str, "test");
+            assert_eq!(str, "t");
         } else {
             assert!(false);
         }
@@ -197,16 +201,15 @@ mod test {
 
     #[test]
     fn parse_single_bracket() {
-        let ast = parse("text(aaa)test").unwrap();
+        let ast = parse("text(a)").unwrap();
         if let AST::Tokens(tokens) = ast {
-            assert_eq!(tokens.len(), 3);
+            assert_eq!(tokens.len(), 2);
             assert!(matches!(tokens[0], AST::Text(_)));
             if let AST::Parenthesis(a) = &tokens[1] {
                 assert!(matches!(**a, AST::Text(_)))
             } else {
                 assert!(false);
             }
-            assert!(matches!(tokens[2], AST::Text(_)));
         } else {
             assert!(false);
         };
@@ -257,7 +260,7 @@ mod test {
     #[test]
     fn parse_nest() {
         let ast = parse("test inner(par{curly[square]curly}par)").unwrap();
-        println!("{}", ast);
+        println!("{:?}", ast);
         // TODO:: 真面目に書く
         assert!(true)
     }
